@@ -1,4 +1,5 @@
 import { Square } from "./Square"
+import PropTypes from 'prop-types'
 
 export function WinnerModal({winner, resetGame}) {
     if (winner === null) return null
@@ -31,4 +32,9 @@ export function WinnerModal({winner, resetGame}) {
         </section>
     )
 
+}
+
+WinnerModal.propTypes = {
+    winner: PropTypes.string,
+    resetGame: PropTypes.func.isRequired
 }

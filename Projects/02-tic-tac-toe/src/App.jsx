@@ -6,18 +6,30 @@ import { checkWinnerFrom } from './logic/board'
 import { checkEndGame } from './logic/board'
 import { WinnerModal } from './components/WinnerModal'
 import './App.css'
+import { GameBoard } from './components/GameBoard'
 
 export function App() {
 
-  const [board, setBoard] = useState(Array(9).fill(null))
+  const [board, setBoard] = useState(() => {
+    const savedBoard = window.localStorage.getItem('board')
+    return savedBoard ? JSON.parse(savedBoard) : Array(9).fill(null)
+  }
+  )
 
-  const [turn, setTurn] = useState(TURNS.X)
+  const [turn, setTurn] = useState(() => {
+    const savedTurn = window.localStorage.getItem('turn')
+    return savedTurn ? savedTurn : TURNS.X
+  })
+
   const [winner, setWinner] = useState(null) //false: draw & null : no winner
 
   const resetGame = () => {
     setBoard(Array(9).fill(null))
     setTurn(TURNS.X)
     setWinner(null)
+
+    window.localStorage.removeItem('board')
+    window.localStorage.removeItem('turn')
   }
 
   const updateBoard = (index) => {
@@ -34,6 +46,10 @@ export function App() {
     const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X
     setTurn(newTurn)
 
+    //Save the game state
+    window.localStorage.setItem('board', JSON.stringify(newBoard))
+    window.localStorage.setItem('turn', newTurn)
+
     //Check if there is a winner
     const newWinner = checkWinnerFrom(newBoard)
     if (newWinner) {
@@ -47,22 +63,8 @@ export function App() {
   return (
     <main className='board'>
       <h1>Tic tac toe</h1>
-      <section className='game'>
-        {
-          board.map((_, index) => {
-            return (
-              <Square
-                key={index}
-                index={index}
-                updateBoard={updateBoard}
-              >
-                {board[index]}
-              </Square>
-            )
-          })
-        }
 
-      </section>
+      <GameBoard board={board} updateBoard={updateBoard} />
 
       <section className='turn'>
         <Square isSelected={turn == TURNS.X} >
